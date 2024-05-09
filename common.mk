@@ -9,24 +9,29 @@ INCLUDES := -I$(COMMON_DIR) \
 			-I$(PROGRAM_DIR)/inc \
 			-I$(PROGRAM_DIR)/inc/layers \
 			-I$(PROGRAM_DIR)/port \
-			-I$(PROGRAM_DIR)/keyword_spotting
-
+			-I$(PROGRAM_DIR)/keyword_spotting \
+			-I/home/ishna/FYP/ibex/lowrisc-toolchain-gcc-rv32imcb-20240206-1/lib/gcc/riscv32-unknown-elf/10.2.0/include-fixed/
+			
+			
+			
+		
 
 
 EXTRA_SRCS := $(wildcard $(PROGRAM_DIR)/src/backends/*.c) \
 			  $(wildcard $(PROGRAM_DIR)/src/core/*.c) \
 			  $(wildcard $(PROGRAM_DIR)/src/layers/*.c) \
+			  $(wildcard $(PROGRAM_DIR)/port/*.c) \
 			  $(wildcard $(PROGRAM_DIR)/keyword_spotting/*.c)
 
 INCS := -I$(COMMON_DIR) -I$(INCLUDES)
 
 # ARCH = rv32im # to disable compressed instructions
-ARCH ?= rv32imc
+ARCH ?= rv32im
 
-ifdef PROGRAM
-PROGRAM_C := $(PROGRAM).c
-endif
-
+# ifdef PROGRAM
+# PROGRAM_C := $(PROGRAM).c
+# endif
+PROGRAM_C := nnom_.c
 SRCS = $(COMMON_SRCS) $(PROGRAM_C) $(EXTRA_SRCS)
 
 C_SRCS = $(filter %.c, $(SRCS))
@@ -41,14 +46,14 @@ OBJDUMP ?= $(CROSS_COMPILE)objdump
 LINKER_SCRIPT ?= $(COMMON_DIR)/link.ld
 CRT ?= $(COMMON_DIR)/crt0.S
 CFLAGS ?= -march=$(ARCH) -mabi=ilp32 -static -mcmodel=medany -Wall -g -Os\
-	-fvisibility=hidden -nostartfiles -ffreestanding -ffunction-sections -fdata-sections -O2 $(PROGRAM_CFLAGS) 
+	-fvisibility=hidden -nostdlib -fno-builtin -nostartfiles -ffreestanding -ffunction-sections -fdata-sections $(PROGRAM_CFLAGS) 
 # CFLAGS ?= -march=$(ARCH) -mabi=ilp32 -static -mcmodel=medany -Wall -g -Os\
 # 	-fvisibility=hidden -nostdlib -nostartfiles -ffreestanding $(PROGRAM_CFLAGS) 
 # CFLAGS += -pg
 # LDFLAGS += -pg
 LIBRARY_PATH := /home/ishna/FYP/ibex/lowrisc-toolchain-gcc-rv32imcb-20240206-1/riscv32-unknown-elf/lib
 
-LIBS := -lm -lgcc -lc 
+LIBS :=  -lm -lgcc 
 OBJS := ${C_SRCS:.c=.o} ${ASM_SRCS:.S=.o} ${CRT:.S=.o}
 DEPS = $(OBJS:%.o=%.d)
 
@@ -71,7 +76,7 @@ disassemble: $(PROGRAM).dispcount_enable(0);
 endif
 
 %.dis: %.elf
-	$(OBJDUMP) -fhSD $^ > $@
+	$(OBJDUMP) -hDx --wide $^ > $@
 
 # Note: this target requires the srecord package to be installed.
 # XXX: This could be replaced by objcopy once

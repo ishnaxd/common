@@ -4,7 +4,9 @@
 
 #ifndef SIMPLE_SYSTEM_COMMON_H__
 
-#include <stdint.h>
+// #include <stdint.h>
+// #include "../../../../../riscv32-unknown-elf/include/stdint.h"
+#include <../include/stdint-gcc.h>
 
 #include "simple_system_regs.h"
 
